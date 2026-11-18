@@ -1,0 +1,48 @@
+# .NET build and test output
+[Bb]in/
+[Oo]bj/
+[Tt]est[Rr]esults/
+/test-results/
+*.trx
+*.coverage
+*.coveragexml
+
+# Local IDE state (shared settings are kept trackable)
+.vs/
+*.suo
+*.user
+*.rsuser
+*.userosscache
+*.sln.docstates
+**/.idea/workspace.xml
+**/.idea/tasks.xml
+**/.idea/shelf/
+
+# Runtime logs
+/logs/
+*.log
+
+# SQL Server backups and exports
+/back-up-28-10
+*.bak
+*.trn
+*.bacpac
+
+# Local configuration and credentials
+/.env
+/.env.*
+!/.env.example
+!/.env.sample
+!/.env.template
+!/.env.*.example
+!/.env.*.sample
+!/.env.*.template
+/secrets.json
+/client-id+secret_code.json
+*.pfx
+*.p12
+
+# The root appsettings.json currently contains a JWT signing key.
+/appsettings.json
+/appsettings.[Ll]ocal.json
+/appsettings.*.[Ll]ocal.json
