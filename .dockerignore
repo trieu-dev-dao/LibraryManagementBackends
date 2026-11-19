@@ -1,0 +1,25 @@
+# Build context for this standalone project: only the project and C# sources.
+**
+!LibraryManagement.csproj
+!Program.cs
+!Controllers/**/*.cs
+!Data/**/*.cs
+!DTOs/**/*.cs
+!Migrations/**/*.cs
+!Models/**/*.cs
+!Repositories/**/*.cs
+!Security/**/*.cs
+!Services/**/*.cs
+**/bin
+**/obj
+**/.git
+**/.env*
+**/appsettings*.json
+**/secrets.json
+**/*.bak
+**/*.bacpac
+**/*.trn
+**/*.pfx
+**/*.p12
+**/*.pem
+**/*.key

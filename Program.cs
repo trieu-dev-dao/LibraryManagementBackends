@@ -14,13 +14,24 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi;
 
-DotNetEnv.Env.Load();
+DotNetEnv.Env.NoClobber().Load();
 
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Configuration.AddEnvironmentVariables();
 
-// 1. Database: SQL Server Express.
+var port = Environment.GetEnvironmentVariable("PORT");
+if (port is not null)
+{
+    if (!int.TryParse(port, out var httpPort) || httpPort is < 1 or > 65535)
+    {
+        throw new InvalidOperationException("PORT must be an integer between 1 and 65535.");
+    }
+
+    builder.WebHost.UseUrls($"http://0.0.0.0:{httpPort}");
+}
+
+// 1. Database: SQL Server.
 var connectionString =
     builder.Configuration.GetConnectionString("DefaultConnection")
     ?? throw new InvalidOperationException(
@@ -141,15 +152,18 @@ builder.Services.AddAuthorization(options =>
 
 // 8. CORS.
 const string CorsPolicyName = "AllowReactApp";
+var allowedOrigins = builder.Configuration.GetSection("Cors:AllowedOrigins").Get<string[]>() ?? [];
+if (builder.Environment.IsDevelopment())
+{
+    allowedOrigins = [..allowedOrigins, "http://localhost:3000", "http://localhost:5173"];
+}
 
 builder.Services.AddCors(options =>
 {
     options.AddPolicy(CorsPolicyName, policy =>
     {
         policy
-            .WithOrigins(
-                "http://localhost:3000",
-                "http://localhost:5173")
+            .WithOrigins(allowedOrigins)
             .AllowAnyMethod()
             .AllowAnyHeader()
             .AllowCredentials();
@@ -198,7 +212,11 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+// The PORT listener speaks HTTP. Render terminates TLS and redirects public HTTP at the edge.
+if (port is null)
+{
+    app.UseHttpsRedirection();
+}
 
 app.UseRouting();
 
@@ -208,5 +226,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+app.MapGet("/health", () => Results.Ok(new { status = "ok" })).AllowAnonymous();
 
 app.Run();
